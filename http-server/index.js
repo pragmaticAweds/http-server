@@ -10,8 +10,14 @@ const server = createServer((req, res) => {
   const reqPath = req.url.split("/")[1];
 
   const reqId = +req.url.split("/")[2];
-
-  if (reqPath === "friend") {
+  if (req.method === "POST" && items[1] === "friends") {
+    req.on("data", (data) => {
+      const friend = data.toString();
+      console.log("Request:", friend);
+      friends.push(JSON.parse(friend));
+    });
+    req.pipe(res);
+  } else if (req.method === "GET" && reqPath === "friend") {
     res.statusCode = 200;
     res.setHeader("Content-type", "application/json");
     if (reqId) {
@@ -19,7 +25,7 @@ const server = createServer((req, res) => {
     } else {
       res.end(JSON.stringify(friends));
     }
-  } else if (reqPath === "message") {
+  } else if (req.method && reqPath === "message") {
     res.setHeader("Content-type", "text/html");
     res.write("<html>");
     res.write("<body>");

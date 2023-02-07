@@ -2,6 +2,8 @@ const express = require("express");
 
 const app = express();
 
+const cluster = require("cluster");
+
 function delay(duration) {
   const startNow = Date.now();
   while (Date.now() - startNow < duration) {
@@ -24,4 +26,13 @@ app.get("/timer", (req, res) => {
   res.send("Ding ding ding!");
 });
 
-app.listen(8080, () => console.log("Working on port 8080"));
+console.log("Running Server now");
+
+if (cluster.isMaster) {
+  console.log("Master is running");
+  cluster.fork();
+  cluster.fork();
+} else {
+  console.log("Worker process started");
+  app.listen(8080, () => console.log("Working on port 8080"));
+}

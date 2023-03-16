@@ -2,13 +2,12 @@ const { readFileSync } = require("fs");
 const path = require("path");
 const https = require("https");
 const express = require("express");
+const app = express();
 const helmet = require("helmet");
 const passport = require("passport");
 const { Strategy } = require("passport-google-oauth20");
 const cookieSession = require("cookie-session");
-const app = express();
 app.use(helmet());
-app.use(passport.initialize());
 
 require("dotenv").config();
 
@@ -27,6 +26,8 @@ app.use(
   })
 );
 
+app.use(passport.initialize());
+app.use(passport.session());
 const PORT = 3000;
 
 const AUTH_OPTIONS = {
@@ -41,10 +42,11 @@ function verifyCallback(accessToken, refreshToken, profile, done) {
 }
 
 passport.use(new Strategy(AUTH_OPTIONS, verifyCallback));
-//check if user is logged in
 
+//check if user is logged in
 function checkedIsLogggedIn(req, res, next) {
-  const isLoggedIn = true;
+  // console.log("Check current user: ", req.user);
+  const isLoggedIn = req.isAuthenticated() && req.user;
   if (!isLoggedIn) {
     return res.status(401).json({
       error: "You have to be looged in",
@@ -52,6 +54,16 @@ function checkedIsLogggedIn(req, res, next) {
   }
   next();
 }
+
+//saving user session to cookie
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+//reading user session from cookie
+passport.deserializeUser((id, done) => {
+  done(null, id);
+});
 
 app.get(
   "/auth/google",
@@ -64,13 +76,15 @@ app.get(
   passport.authenticate("google", {
     failureRedirect: "/failure",
     successRedirect: "/",
-    session: false,
   }),
   (req, res) => {
     console.log("Google called us back ");
   }
 );
-app.get("/auth/logout", (req, res) => {});
+app.get("/auth/logout", (req, res) => {
+  req.logout();
+  return res.redirect("/");
+});
 
 app.get("/secret", checkedIsLogggedIn, (req, res) => {
   res.send("YOur personal secret value is 42!!");

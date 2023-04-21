@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "tsnode src"
+    "dev": "nodemon src"
   },
   "author": "AbdulAfeez Jimoh",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
 }

@@ -2,14 +2,14 @@
   "name": "websocket",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon src"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "author": "AbdulAfeez Jimoh",
   "license": "MIT",
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "socket.io": "^4.6.1"
   }
 }

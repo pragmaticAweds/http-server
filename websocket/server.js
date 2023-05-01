@@ -19,8 +19,16 @@ io.on("connection", (socket) => {
   console.log("a user just connected", socket.id);
 
   socket.on("ready", () => {
-    console.log("Player is ready", socket.id);
+    // console.log("Player is ready", socket.id);
 
     readyPlayerCount++;
+
+    if (readyPlayerCount === 2) {
+      io.emit("startGame", socket.id);
+    }
+  });
+
+  socket.on("paddleMove", (paddleData) => {
+    socket.broadcast.emit("paddleMove", paddleData);
   });
 });

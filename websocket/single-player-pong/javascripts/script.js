@@ -214,11 +214,11 @@ function startGame() {
 loadGame();
 
 socket.on("connect", () => {
-  console.log("Connected as...", socket.id);
+  console.log("Connected as ", socket.id);
 });
 
 socket.on("startGame", (refereeId) => {
-  console.log("referee Id is .....", refereeId);
+  console.log("referee Id is ", refereeId);
 
   isReferee = refereeId === socket.id;
   startGame();

@@ -19,8 +19,6 @@ io.on("connection", (socket) => {
   console.log("a user just connected", socket.id);
 
   socket.on("ready", () => {
-    // console.log("Player is ready", socket.id);
-
     readyPlayerCount++;
 
     if (readyPlayerCount === 2) {

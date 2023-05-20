@@ -93,6 +93,11 @@ function ballReset() {
   ballX = width / 2;
   ballY = height / 2;
   speedY = 3;
+  socket.emit("ballMove", {
+    ballX,
+    ballY,
+    score,
+  });
 }
 
 // Adjust Ball Movement
@@ -103,6 +108,11 @@ function ballMove() {
   if (playerMoved) {
     ballX += speedX;
   }
+  socket.emit("ballMove", {
+    ballX,
+    ballY,
+    score,
+  });
 }
 
 // Determine What Ball Bounces Off, Score Points, Reset Ball
@@ -178,11 +188,12 @@ function ballBoundaries() {
 
 // Called Every Frame
 function animate() {
-  // computerAI();
-  ballMove();
-  renderCanvas();
-  ballBoundaries();
-  window.requestAnimationFrame(animate);
+  if (isReferee) {
+    ballMove();
+    ballBoundaries();
+    renderCanvas();
+    window.requestAnimationFrame(animate);
+  }
 }
 
 // Load Game, Reset Everything

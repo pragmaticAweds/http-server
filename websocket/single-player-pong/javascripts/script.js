@@ -239,3 +239,5 @@ socket.on("paddleMove", (paddleData) => {
   const opponentIndex = 1 - paddleIndex;
   paddleX[opponentIndex] = paddleData.xPositon;
 });
+
+socket.on("ballMove", (ballData) => ({ballX, ballY, score}) = ballData);

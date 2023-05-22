@@ -1,10 +1,8 @@
 // Canvas Related
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
-const socket = io("http://localhost:3000");
-
+const socket = io("/pong");
 let isReferee = false;
-
 let paddleIndex = 0;
 
 let width = 500;
@@ -18,7 +16,7 @@ let paddleX = [225, 225];
 let trajectoryX = [0, 0];
 let playerMoved = false;
 
-// BallR
+// Ball
 let ballX = 250;
 let ballY = 350;
 let ballRadius = 5;
@@ -27,7 +25,6 @@ let ballDirection = 1;
 // Speed
 let speedY = 2;
 let speedX = 0;
-// let computerSpeed = 4;
 
 // Score for Both Players
 let score = [0, 0];
@@ -160,40 +157,20 @@ function ballBoundaries() {
       trajectoryX[1] = ballX - (paddleX[1] + paddleDiff);
       speedX = trajectoryX[1] * 0.3;
     } else {
-      // Reset Ball, Increase Computer Difficulty, add to Player Score
-      // if (computerSpeed < 6) {
-      //   computerSpeed += 0.5;
-      // }
       ballReset();
       score[0]++;
     }
   }
 }
 
-// Computer Movement
-// function computerAI() {
-//   if (playerMoved) {
-//     if (paddleX[1] + paddleDiff < ballX) {
-//       paddleX[1] += computerSpeed;
-//     } else {
-//       paddleX[1] -= computerSpeed;
-//     }
-//     if (paddleX[1] < 0) {
-//       paddleX[1] = 0;
-//     } else if (paddleX[1] > width - paddleWidth) {
-//       paddleX[1] = width - paddleWidth;
-//     }
-//   }
-// }
-
 // Called Every Frame
 function animate() {
   if (isReferee) {
     ballMove();
     ballBoundaries();
-    renderCanvas();
-    window.requestAnimationFrame(animate);
   }
+  renderCanvas();
+  window.requestAnimationFrame(animate);
 }
 
 // Load Game, Reset Everything
@@ -215,7 +192,9 @@ function startGame() {
     if (paddleX[paddleIndex] > width - paddleWidth) {
       paddleX[paddleIndex] = width - paddleWidth;
     }
-    socket.emit("paddleMove", { xPosition: paddleX[paddleIndex] });
+    socket.emit("paddleMove", {
+      xPosition: paddleX[paddleIndex],
+    });
     // Hide Cursor
     canvas.style.cursor = "none";
   });
@@ -225,19 +204,22 @@ function startGame() {
 loadGame();
 
 socket.on("connect", () => {
-  console.log("Connected as ", socket.id);
+  console.log("Connected as...", socket.id);
 });
 
 socket.on("startGame", (refereeId) => {
-  console.log("referee Id is ", refereeId);
+  console.log("Referee is", refereeId);
 
-  isReferee = refereeId === socket.id;
+  isReferee = socket.id === refereeId;
   startGame();
 });
 
 socket.on("paddleMove", (paddleData) => {
-  const opponentIndex = 1 - paddleIndex;
-  paddleX[opponentIndex] = paddleData.xPositon;
+  // Toggle 1 into 0, and 0 into 1
+  const opponentPaddleIndex = 1 - paddleIndex;
+  paddleX[opponentPaddleIndex] = paddleData.xPosition;
 });
 
-socket.on("ballMove", (ballData) => ({ballX, ballY, score}) = ballData);
+socket.on("ballMove", (ballData) => {
+  ({ ballX, ballY, score } = ballData);
+});
